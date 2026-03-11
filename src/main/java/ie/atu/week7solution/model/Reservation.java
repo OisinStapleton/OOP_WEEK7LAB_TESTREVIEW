@@ -30,4 +30,9 @@ public class Reservation {
     @Max(value = 23, message = "Start hour must be between 0 & 23")
     private int startHour;
 
+    public void setReservationId(long l) {
+    }
+
+    public int getDurationHours() {
+    }
 }
