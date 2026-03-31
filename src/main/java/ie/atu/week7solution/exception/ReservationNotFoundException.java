@@ -1,8 +1,9 @@
 package ie.atu.week7solution.exception;
 
-import org.springframework.stereotype.Service;
+public class ReservationNotFoundException extends RuntimeException {
 
-@Service
-class ReservationNotFoundException {
-
+    public ReservationNotFoundException(String reservationNotFound)
+    {
+        super(reservationNotFound);
+    }
 }

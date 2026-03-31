@@ -1,48 +1,69 @@
 package ie.atu.week7solution.service;
 
 import ie.atu.week7solution.exception.ReservationConflictException;
+import ie.atu.week7solution.exception.ReservationNotFoundException;
 import ie.atu.week7solution.model.Reservation;
+import jakarta.annotation.Nullable;
 import jakarta.validation.Valid;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.servlet.FrameworkServlet;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class ReservationService {
 
     private List<Reservation> reservations = new ArrayList<>();
-    private long nextID = 1;
+    private int nextId = 1;
 
+    public ReservationService(FrameworkServlet frameworkServlet) {
+    }
+
+    //Create
     public Reservation addReservation(Reservation reservation) {
-
         //Assign ID
-        reservation.setReservationId(nextID++);
+        reservation.setReservationId(nextId++);
 
-        //Check time conflicts
-        for (Reservation existingReservation : reservations) {
+        //Check for Time Conflicts
+        for (Reservation existing : reservations) {
 
-            //same equipment & same date
-            int existingStart = 0;
-            if (existingReservation.getEquipmentTag().equals(reservation.getEquipmentTag()) &&
-                    existingReservation.getReservationDate().equals(reservation.getReservationDate())) {
-            }existingStart = existingReservation.getStartHour();
-            int existingEnd = existingStart + existingReservation.getDurationHours();
+            /* Same Equipment + same date */
+            if (existing.getEquipmentTag().equals(reservation.getEquipmentTag()) ||
+                    existing.getReservationDate().equals(reservation.getReservationDate())) ;
+
+            int existingStart = existing.getStartHour();
+            int existingEnd = existingStart + existing.getDurationHours();
 
             int newStart = reservation.getStartHour();
-            int newEnd = reservation.getDurationHours();
+            int newEnd = newStart + reservation.getDurationHours();
+
             //Overlap Check
-
-            if (existingStart < newEnd && newStart <= existingEnd) {
-
-                //RemoveID
-                int nextID;
-                reservation.setReservationDate(nextID--);
+            if (existingStart < newEnd && newStart < existingEnd) {
+                //Remove ID
+                reservation.setStartHour(nextId--);
                 throw new ReservationConflictException("Time slot already booked");
             }
         }
-    reservations.add(reservation);
-    return reservation;
-}
+        reservations.add(reservation);
+        return reservation;
+    }
+
+    public List<Reservation> getAllReservations()
+    {
+        return reservations;
+    }
+
+    //GET BY ID
+    public Reservation getReservationById(int id){
+        for (Reservation reservation : reservations) {
+            if(Objects.equals(reservation.getReservationId(), id)){ //this line is different from tutorial (long to int issue)
+                return reservation;
+            }
+        }
+
+        throw new ReservationNotFoundException("Reservation not found");
+    }
 }

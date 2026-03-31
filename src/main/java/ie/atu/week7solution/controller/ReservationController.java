@@ -1,5 +1,6 @@
 package ie.atu.week7solution.controller;
 
+import ie.atu.week7solution.exception.ReservationNotFoundException;
 import ie.atu.week7solution.model.Reservation;
 import ie.atu.week7solution.service.ReservationService;
 import jakarta.validation.Valid;
@@ -19,10 +20,22 @@ public class ReservationController {
         this.reservationService = reservationService;
     }
 
-    // create
+    // Create
     @PostMapping
     public ResponseEntity<Reservation> create(@Valid @RequestBody Reservation reservation) {
         Reservation saved = reservationService.addReservation(reservation);
         return ResponseEntity.status(HttpStatus.CREATED).body(saved);
     }
-}
+
+    //GetAll
+    @GetMapping
+    public ResponseEntity<List<Reservation>> getAll() {
+        return ResponseEntity.ok(reservationService.getAllReservations());
+    }
+
+    //Get one
+    @GetMapping("{id}")
+    public ResponseEntity<Reservation> getById(int id) {
+        return ResponseEntity.ok(reservationService.getReservationById(id));
+            }
+        }
